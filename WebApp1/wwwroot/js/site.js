@@ -4,43 +4,60 @@
 // Write your Javascript code.
 
 
+function parseSpeech(speech)
+{
+
+}
+
+function doCommand()
+{
+}
+
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-//if ('SpeechRecognition' in window) {
-//    // speech recognition API supported
+if ('SpeechRecognition' in window) {
+    // speech recognition API supported
 
-//    //alert('supported');
-//    const recognition = new window.SpeechRecognition();
-//    var hasBalloon = false;
-//    recognition.continuous = true;
-//    //recognition.interimResults = true;
+    const recognition = new window.SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    var stopListening = false;  //.. Flag recognizes 'exit' request
 
-//    recognition.onresult = (event) => {
-//        const speechToText = event.results[0][0].transcript;
-//        if (speechToText.includes('hello')){
-//            $('#textFromSpeech').empty();
-//            $('#textFromSpeech').val(speechToText + "ggg");
-//            hasBalloon = true;
- 
-//            //recognition.stop();
-//            //recognition.start();
-//        }
-//        else {
-//            $('#textFromSpeech').empty();
-//            $('#textFromSpeech').val(speechToText + "www");
-//            hasBalloon = false;
-//            //recognition.stop();
-//            //recognition.start();
-//        }
+    recognition.onresult = function (event) {
+        const speechToText = event.results[0][0].transcript;
+        if (speechToText.includes('exit'))
+        {
+            //.. Exit listening
 
-//        recognition.onend = function () {
-//            console.log('Speech recognition service disconnected');
-//            debugger;
-//        }
-//    }
-//    recognition.start();
+            stopListening = true;
+        }
+        else if (speechToText.includes('hello'))
+        {
+            //.. 
+            $('#textFromSpeech').empty();
+            $('#textFromSpeech').val(speechToText + " - Balloon");
 
+            //parseSpeech(speechToText);
+        }
+        else
+        {
+            //.. This is speech without keyword invocation
+            $('#textFromSpeech').val(speechToText + " - Giberish");
+        }
 
-//} else {
-//    // speech recognition API not supported
-//    alert('not');
-//}
+        //.. onend function. determine if needed to start listening again.
+        recognition.onend = function () {
+            //console.log('Speech recognition service disconnected');
+            if (!stopListening)
+                recognition.start();
+            else
+                $('#textFromSpeech').val('Exited');
+        }
+    }
+
+    recognition.start();
+}
+else {
+    // speech recognition API not supported
+    //alert('not');
+   $('#textFromSpeech').val('Speech recognition NOT SUPPORTED');
+}
