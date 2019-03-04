@@ -4,12 +4,28 @@
 // Write your Javascript code.
 
 
-function parseSpeech(speech)
-{
+//globals
+const triggerWord = 'hello';
+//.. Speech parser
+function parseSpeech(speech) {
+    var arr = speech.split(triggerWord);
 
+    if (arr.length = 2)
+    {   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
+        $('#textFromSpeech').empty();
+        $('#textFromSpeech').val(arr[1] + " - Parsed");
+    }
+    else
+    {
+        $('#textFromSpeech').empty();
+        $('#textFromSpeech').val("Parsing Failed!");
+    }
+
+    doCommand(arr[1]);
 }
 
-function doCommand()
+//.. Execute given command
+function doCommand(strCommand)
 {
 }
 
@@ -30,13 +46,9 @@ if ('SpeechRecognition' in window) {
 
             stopListening = true;
         }
-        else if (speechToText.includes('hello'))
+        else if (speechToText.includes(triggerWord))
         {
-            //.. 
-            $('#textFromSpeech').empty();
-            $('#textFromSpeech').val(speechToText + " - Balloon");
-
-            //parseSpeech(speechToText);
+            parseSpeech(speechToText);
         }
         else
         {
@@ -59,5 +71,5 @@ if ('SpeechRecognition' in window) {
 else {
     // speech recognition API not supported
     //alert('not');
-   $('#textFromSpeech').val('Speech recognition NOT SUPPORTED');
+   $('#textFromSpeech').val('Aw. Looks like your browser does not support Web Speech API.  Update browser or try a different browser.');
 }
