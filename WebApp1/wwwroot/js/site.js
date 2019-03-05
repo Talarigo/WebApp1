@@ -55,15 +55,16 @@ if ('SpeechRecognition' in window) {
             //.. This is speech without keyword invocation
             $('#textFromSpeech').val(speechToText + " - Giberish");
         }
+    }
 
-        //.. onend function. determine if needed to start listening again.
-        recognition.onend = function () {
-            //console.log('Speech recognition service disconnected');
-            if (!stopListening)
-                recognition.start();
-            else
-                $('#textFromSpeech').val('Exited');
-        }
+    //.. onend function. determine if needed to start listening again.
+    recognition.onend = function ()
+    {
+        //console.log('Speech recognition service disconnected');
+        if (!stopListening)
+            recognition.start();
+        else
+            $('#textFromSpeech').val('Exited');
     }
 
     recognition.start();
