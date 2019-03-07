@@ -19,6 +19,9 @@ function onStopRecipe() {
 function onPauseRecipe() {
     var msg = new SpeechSynthesisUtterance("Paused! Press Start when ready!");
     window.speechSynthesis.speak(msg);
+
+
+
 }
 
 //.. Execute given command
