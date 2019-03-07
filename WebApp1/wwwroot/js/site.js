@@ -6,17 +6,45 @@
 
 //globals
 const triggerWord = 'hello';
+function onStartRecipe() {
+    var msg = new SpeechSynthesisUtterance("Let's get cooking!");
+    window.speechSynthesis.speak(msg);
+}
+
+function onStopRecipe() {
+    var msg = new SpeechSynthesisUtterance("Stopped. Thank you for cooking with us!");
+    window.speechSynthesis.speak(msg);
+}
+
+function onPauseRecipe() {
+    var msg = new SpeechSynthesisUtterance("Paused! Press Start when ready!");
+    window.speechSynthesis.speak(msg);
+}
+
+//.. Execute given command
+function doCommand(strCommand) {
+    var msg = new SpeechSynthesisUtterance("Sorry! I did not understand your request!");
+    if (strCommand.includes("start recipe"))
+        onStartRecipe();
+    else if (strCommand.includes("stop"))
+        onStopRecipe();
+    else if (strCommand.includes("pause"))
+        onPauseRecipe();
+    else
+        window.speechSynthesis.speak(msg);
+
+}
+
+
 //.. Speech parser
 function parseSpeech(speech) {
     var arr = speech.split(triggerWord);
 
-    if (arr.length = 2)
-    {   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
+    if (arr.length = 2) {   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
         $('#textFromSpeech').empty();
         $('#textFromSpeech').val(arr[1] + " - Parsed");
     }
-    else
-    {
+    else {
         $('#textFromSpeech').empty();
         $('#textFromSpeech').val("Parsing Failed!");
     }
@@ -24,10 +52,8 @@ function parseSpeech(speech) {
     doCommand(arr[1]);
 }
 
-//.. Execute given command
-function doCommand(strCommand)
-{
-}
+
+
 
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if ('SpeechRecognition' in window) {
