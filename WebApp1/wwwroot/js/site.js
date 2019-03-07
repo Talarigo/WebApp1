@@ -3,25 +3,24 @@
 
 // Write your Javascript code.
 
-
 //globals
 const triggerWord = 'hello';
-function onStartRecipe() {
+function onStartRecipe()
+{
     var msg = new SpeechSynthesisUtterance("Let's get cooking!");
     window.speechSynthesis.speak(msg);
 }
 
-function onStopRecipe() {
+function onStopRecipe()
+{
     var msg = new SpeechSynthesisUtterance("Stopped. Thank you for cooking with us!");
     window.speechSynthesis.speak(msg);
 }
 
-function onPauseRecipe() {
+function onPauseRecipe()
+{
     var msg = new SpeechSynthesisUtterance("Paused! Press Start when ready!");
     window.speechSynthesis.speak(msg);
-
-
-
 }
 
 //.. Execute given command
@@ -35,9 +34,7 @@ function doCommand(strCommand) {
         onPauseRecipe();
     else
         window.speechSynthesis.speak(msg);
-
 }
-
 
 //.. Speech parser
 function parseSpeech(speech) {
@@ -55,11 +52,22 @@ function parseSpeech(speech) {
     doCommand(arr[1]);
 }
 
-
-
+function say(m) {
+    var msg = new SpeechSynthesisUtterance();
+    var voices = window.speechSynthesis.getVoices();
+    msg.voice = voices[2];
+    msg.voiceURI = "native";
+    msg.volume = 1;
+    msg.rate = 1;
+    msg.pitch = 0.8;
+    msg.text = m;
+    msg.lang = 'en-US';
+    speechSynthesis.speak(msg);
+}
 
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-if ('SpeechRecognition' in window) {
+if ('SpeechRecognition' in window)
+{
     // speech recognition API supported
 
     const recognition = new window.SpeechRecognition();
@@ -67,12 +75,12 @@ if ('SpeechRecognition' in window) {
     recognition.interimResults = false;
     var stopListening = false;  //.. Flag recognizes 'exit' request
 
-    recognition.onresult = function (event) {
+    recognition.onresult = function (event)
+    {
         const speechToText = event.results[0][0].transcript;
         if (speechToText.includes('exit'))
         {
             //.. Exit listening
-
             stopListening = true;
         }
         else if (speechToText.includes(triggerWord))
@@ -98,7 +106,8 @@ if ('SpeechRecognition' in window) {
 
     recognition.start();
 }
-else {
+else
+{
     // speech recognition API not supported
     //alert('not');
    $('#textFromSpeech').val('Aw. Looks like your browser does not support Web Speech API.  Update browser or try a different browser.');
