@@ -17,30 +17,14 @@ var strFunctionJSON =
     ']'+
 '}';
 //------------------------------------------------------------
-//....  Array of functions : Method 1
-//var array_of_functions = [
-//    function () { onStartRecipe() },
-//    function () { onStopRecipe() },
-//    function () { OnPauseRecipe() },
-//]
-
 //.....  Array of functions : Method 2
 var array_of_actions = [];
-//array_of_actions['start'] = "onStartRecipe()";
-//array_of_actions['stop'] = "onStopRecipe()";
-//array_of_actions['pause'] = "onPauseRecipe()";
-//array_of_actions['unknown'] = "onUnknown()";
 var JSONObj = JSON.parse(strFunctionJSON);
 for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
     var strCommand = JSONObj.CommandFunctions[i].command;
     var strFunction = JSONObj.CommandFunctions[i].function;
     array_of_actions[strCommand] = strFunction;
 }
-
-
-
-//.....  Array of functions : Method 3
-//array_of_methods = ["onStartRecipe()", "onStopRecipe()", "onPauseRecipe()","onUnknown()"]
 
 //------------------------------------------------------------
 
@@ -85,21 +69,20 @@ function onUnknown()
 //.. Execute given command
 function doCommand(strSpeech)
 {
-    var strCommand="";
+    var strCommand = "";
+    //.. IMPORTANT: strings in the .include call MUST be lowercase
+    //..         NOTE: strSpeech is ALWAYS lowercase
     if (strSpeech.includes("start"))
     {
         strCommand = 'start';
-        //array_of_functions[0]();
     }
     else if (strSpeech.includes("stop"))
     {
         strCommand = 'stop';
-        //array_of_functions[1]();
     }
     else if (strSpeech.includes("pause"))
     {
         strCommand = 'pause';
-        //array_of_functions[2]();
     }
     else
     {
