@@ -5,35 +5,108 @@
 
 //globals
 const triggerWord = 'hello';
+
+//.. JSON data....
+var strFunctionJSON =
+'{ "CommandFunctions" : '+
+    '['+
+        '{ "command": "start", "function": "onStartRecipe()" },'+
+        '{ "command": "stop", "function": "onStopRecipe()" },'+
+        '{ "command": "pause", "function": "onPauseRecipe()" },'+
+        '{ "command": "unknown", "function": "onUnknown()" }'+
+    ']'+
+'}';
+//------------------------------------------------------------
+//....  Array of functions : Method 1
+//var array_of_functions = [
+//    function () { onStartRecipe() },
+//    function () { onStopRecipe() },
+//    function () { OnPauseRecipe() },
+//]
+
+//.....  Array of functions : Method 2
+var array_of_actions = [];
+//array_of_actions['start'] = "onStartRecipe()";
+//array_of_actions['stop'] = "onStopRecipe()";
+//array_of_actions['pause'] = "onPauseRecipe()";
+//array_of_actions['unknown'] = "onUnknown()";
+var JSONObj = JSON.parse(strFunctionJSON);
+for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
+    var strCommand = JSONObj.CommandFunctions[i].command;
+    var strFunction = JSONObj.CommandFunctions[i].function;
+    array_of_actions[strCommand] = strFunction;
+}
+
+
+
+//.....  Array of functions : Method 3
+//array_of_methods = ["onStartRecipe()", "onStopRecipe()", "onPauseRecipe()","onUnknown()"]
+
+//------------------------------------------------------------
+
 function onStartRecipe()
 {
     var msg = new SpeechSynthesisUtterance("Let's get cooking!");
     window.speechSynthesis.speak(msg);
+
+    //.. Launch checklists
+
+    //.. Launch step 1
 }
 
 function onStopRecipe()
 {
-    var msg = new SpeechSynthesisUtterance("Stopped. Thank you for cooking with us!");
+    //.. Note where you were.  Just in case user decides to continue...
+
+    //.. Confirm 
+
+    //.. Turn off times
+
+    var msg = new SpeechSynthesisUtterance("Thank you for cooking with us!Goodbye!");
     window.speechSynthesis.speak(msg);
+
+    //.. Now, should we redirect to home page??  Or just stay on this page
 }
 
 function onPauseRecipe()
 {
-    var msg = new SpeechSynthesisUtterance("Paused! Press Start when ready!");
+    var msg = new SpeechSynthesisUtterance("Paused!Press Start when ready!");
     window.speechSynthesis.speak(msg);
 }
 
-//.. Execute given command
-function doCommand(strCommand) {
+function onUnknown()
+{
     var msg = new SpeechSynthesisUtterance("Sorry! I did not understand your request!");
-    if (strCommand.includes("start recipe"))
-        onStartRecipe();
-    else if (strCommand.includes("stop"))
-        onStopRecipe();
-    else if (strCommand.includes("pause"))
-        onPauseRecipe();
+    window.speechSynthesis.speak(msg);
+    //..say("Sorry! I did not understand your request!");
+}
+//------------------------------------------------------------
+
+//.. Execute given command
+function doCommand(strSpeech)
+{
+    var strCommand="";
+    if (strSpeech.includes("start"))
+    {
+        strCommand = 'start';
+        //array_of_functions[0]();
+    }
+    else if (strSpeech.includes("stop"))
+    {
+        strCommand = 'stop';
+        //array_of_functions[1]();
+    }
+    else if (strSpeech.includes("pause"))
+    {
+        strCommand = 'pause';
+        //array_of_functions[2]();
+    }
     else
-        window.speechSynthesis.speak(msg);
+    {
+        strCommand = 'unknown';
+    }
+    eval(array_of_actions[strCommand]);
+
 }
 
 //.. Speech parser
@@ -55,11 +128,11 @@ function parseSpeech(speech) {
 function say(m) {
     var msg = new SpeechSynthesisUtterance();
     var voices = window.speechSynthesis.getVoices();
-    msg.voice = voices[2];
+    msg.voice = voices[1];
     msg.voiceURI = "native";
     msg.volume = 1;
     msg.rate = 1;
-    msg.pitch = 0.8;
+    msg.pitch = 1.0;
     msg.text = m;
     msg.lang = 'en-US';
     speechSynthesis.speak(msg);
