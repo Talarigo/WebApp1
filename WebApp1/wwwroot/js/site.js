@@ -10,10 +10,10 @@ const triggerWord = 'hello';
 var strFunctionJSON =
 '{ "CommandFunctions" : '+
     '['+
-        '{ "command": "start", "function": "onStartRecipe()" },'+
-        '{ "command": "stop", "function": "onStopRecipe()" },'+
-        '{ "command": "pause", "function": "onPauseRecipe()" },'+
-        '{ "command": "unknown", "function": "onUnknown()" }'+
+        '{ "context": "0", "command": "start", "function": "onStartRecipe()" },'+
+        '{ "context": "0", "command": "stop", "function": "onStopRecipe()" },'+
+        '{ "context": "0", "command": "pause", "function": "onPauseRecipe()" },'+
+        '{ "context": "", "command": "unknown", "function": "onUnknown()" }'+
     ']'+
 '}';
 //------------------------------------------------------------
@@ -21,7 +21,7 @@ var strFunctionJSON =
 var array_of_actions = [];
 var JSONObj = JSON.parse(strFunctionJSON);
 for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
-    var strCommand = JSONObj.CommandFunctions[i].command;
+    var strCommand = JSONObj.CommandFunctions[i].context  +  JSONObj.CommandFunctions[i].command;
     var strFunction = JSONObj.CommandFunctions[i].function;
     array_of_actions[strCommand] = strFunction;
 }
@@ -67,22 +67,22 @@ function onUnknown()
 //------------------------------------------------------------
 
 //.. Execute given command
-function doCommand(strSpeech)
+function doCommand(strContext, strSpeech)
 {
     var strCommand = "";
     //.. IMPORTANT: strings in the .include call MUST be lowercase
     //..         NOTE: strSpeech is ALWAYS lowercase
     if (strSpeech.includes("start"))
     {
-        strCommand = 'start';
+        strCommand = strContext+'start';
     }
     else if (strSpeech.includes("stop"))
     {
-        strCommand = 'stop';
+        strCommand = strContext+'stop';
     }
     else if (strSpeech.includes("pause"))
     {
-        strCommand = 'pause';
+        strCommand = strContext+'pause';
     }
     else
     {
@@ -105,7 +105,7 @@ function parseSpeech(speech) {
         $('#textFromSpeech').val("Parsing Failed!");
     }
 
-    doCommand(arr[1]);
+    doCommand('0', arr[1]); //.. first argument is the context
 }
 
 function say(m) {
