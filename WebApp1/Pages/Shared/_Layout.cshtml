@@ -31,7 +31,7 @@
     <label id="lbltextFromSpeech" title="You said...">You Said</label>
     <input id="textFromSpeech" size="480" />
 
-    <button id="btnStop"  onClick="javascript:onStopStep()"><img src="img/buttons-img/Stop - Glassy Orange.jpg" width="30" height="30" /></button>
+    <button id="btnStop" onClick="javascript:onStopStep()"><img src="img/buttons-img/Stop - Glassy Orange.jpg" width="30" height="30" /></button>
     <button id="btnStart" class="closing" onClick="javascript:onStartStep()"><img src="img/buttons-img/Play - Glassy Orange.jpg" width="30" height="30" /></button>
     <button id="btnPause" class="closing" onClick="javascript:onPauseStep()"><img src="img/buttons-img/Pause - Glassy Orange.jpg" width="30" height="30" /></button>
 
@@ -61,6 +61,7 @@
         </script>
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/CommandFunctions.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

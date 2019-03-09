@@ -6,6 +6,7 @@
 //globals
 const triggerWord = 'hello';
 
+//------------------------------------------------------------
 //.. JSON data....
 var strFunctionJSON =
 '{ "CommandFunctions" : '+
@@ -54,44 +55,6 @@ for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
     array_of_actions[strCommand] = strFunction;
 }
 
-//------------------------------------------------------------
-
-function onStartStep()
-{
-    var msg = new SpeechSynthesisUtterance("Let's get cooking!");
-    window.speechSynthesis.speak(msg);
-
-    //.. Launch checklists
-
-    //.. Launch step 1
-}
-
-function onStopStep()
-{
-    //.. Note where you were.  Just in case user decides to continue...
-
-    //.. Confirm 
-
-    //.. Turn off times
-
-    var msg = new SpeechSynthesisUtterance("Thank you for cooking with us!Goodbye!");
-    window.speechSynthesis.speak(msg);
-
-    //.. Now, should we redirect to home page??  Or just stay on this page
-}
-
-function onPauseStep()
-{
-    var msg = new SpeechSynthesisUtterance("Paused!Press Start when ready!");
-    window.speechSynthesis.speak(msg);
-}
-
-function onUnknown()
-{
-    var msg = new SpeechSynthesisUtterance("Sorry! I did not understand your request!");
-    window.speechSynthesis.speak(msg);
-    //..say("Sorry! I did not understand your request!");
-}
 //------------------------------------------------------------
 
 //.. Execute given command
@@ -148,6 +111,8 @@ function say(m) {
     msg.lang = 'en-US';
     speechSynthesis.speak(msg);
 }
+
+//------------------------------------------------------------
 
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if ('SpeechRecognition' in window)
