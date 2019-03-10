@@ -34,13 +34,15 @@ var strFunctionJSON =
     '{ "context":"", "command":"end timer", "function":"onEndTimer()"},' +
     '{ "context":"", "command":"list timers", "function":"onListTimers()"},' +
     '{ "context":"", "command":"unknown", "function":"onUnknown()"},' +
-    '{ "context":"", "command":"end", "function":"onExitRecipe()"}' +
+    '{ "context":"", "command":"exit", "function":"onExitRecipe()"}' +
     ']' +
     '}';
 
 //------------------------------------------------------------
 function onStartRecipe()
 {
+    stopListening = false;
+
     say("lets start cooking! ");
     onAnnounceTitle();
     onAnnounceDescription();
@@ -87,11 +89,14 @@ function onAddComment()
 
 function onStartStep()
 {
+    stopListening = false;
     say("Step 1");
 
     //.. Launch checklists
+    onListIngredients();
+    onListToolsNeeded();
 
-    //.. Launch step 1
+    //.. Launch step
 }
 
 function onStopStep()
@@ -109,6 +114,27 @@ function onPauseStep()
 {
     say("Paused!Say RESUME when ready to continue");
 }
+
+function onContinueStep()
+{
+    say("Resuming step 1");
+}
+
+function onSkipStep()
+{
+    say("skipping to next step");
+}
+
+function onIngredientSubstitute() {
+    say("What ingredient would you like to substitute?");
+}
+
+function onExitRecipe()
+{
+    stopListening = true;
+    say("Do you want to quit cooking this recipe?");
+}
+
 
 function onUnknown()
 {

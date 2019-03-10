@@ -11,7 +11,7 @@ const triggerWord = 'hello';
 var array_of_actions = [];
 var JSONObj = JSON.parse(strFunctionJSON);
 for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
-    var strCommand = JSONObj.CommandFunctions[i].context + JSONObj.CommandFunctions[i].command;
+    var strCommand = JSONObj.CommandFunctions[i].context  +  JSONObj.CommandFunctions[i].command;
     var strFunction = JSONObj.CommandFunctions[i].function;
     array_of_actions[strCommand] = strFunction;
 }
@@ -36,6 +36,7 @@ function doCommand(strContext, strSpeech)
     {
         strCommand = strContext + 'pause';
     }
+    else if (strSpeech.includes("exit"))
     else
     {
         strCommand = 'unknown';
@@ -73,8 +74,6 @@ function say(m) {
     speechSynthesis.speak(msg);
 }
 
-//------------------------------------------------------------
-
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if ('SpeechRecognition' in window)
 {
@@ -88,12 +87,7 @@ if ('SpeechRecognition' in window)
     recognition.onresult = function (event)
     {
         const speechToText = event.results[0][0].transcript;
-        if (speechToText.includes('exit'))
-        {
-            //.. Exit listening
-            stopListening = true;
-        }
-        else if (speechToText.includes(triggerWord))
+        if (speechToText.includes(triggerWord))
         {
             parseSpeech(speechToText);
         }
