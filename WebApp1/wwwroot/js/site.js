@@ -3,77 +3,127 @@
 
 // Write your Javascript code.
 
-//globals
-const triggerWord = 'hello';
-
 //------------------------------------------------------------
-//.....  Array of functions : Method 2
-var array_of_actions = [];
-var JSONObj = JSON.parse(strFunctionJSON);
-for (i = 0; i < JSONObj.CommandFunctions.length; i++) {
-    var strCommand = JSONObj.CommandFunctions[i].context  +  JSONObj.CommandFunctions[i].command;
-    var strFunction = JSONObj.CommandFunctions[i].function;
-    array_of_actions[strCommand] = strFunction;
+//globals
+//------------------------------------------------------------
+const triggerWord = 'hello';
+sessionStorage["context"] = 'Home';
+sessionStorage["stepNumber"] = 0;
+sessionStorage["speechString"] = '';
+//------------------------------------------------------------
+function PlaySound(filename)
+{
+    //..var sound = document.getElementById(soundObj);
+    //sound = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
+    sound = new Audio(filename);
+    sound.Play();
+    //..
+}
+function onPressButton()
+{
+    //say("Hi. Welcome!");
+    //PlaySound('Indian Bell.mp3');
+    var strTextFromSpeech = document.getElementById("textFromSpeech").value;
+    strTextFromSpeech = strTextFromSpeech.toLowerCase();
+    doCommand(strTextFromSpeech);
 }
 
-//------------------------------------------------------------
-
 //.. Execute given command
-function doCommand(strContext, strSpeech)
+function doCommand(strSpeech)
 {
+    sessionStorage["speechString"] = strSpeech;
     var strCommand = "";
+    var strContext = sessionStorage["context"];
+    var strcont = contextStack[contextStack.length - 1];
+
     //.. IMPORTANT: strings in the .include call MUST be lowercase
     //..         NOTE: strSpeech is ALWAYS lowercase
-    if (strSpeech.includes("start"))
+    //..         NOTE: process 'start timer' before 'start'; 'stop ***' before 'stop'
+
+    if (strSpeech.includes("start timer") || strSpeech.includes("set timer"))
     {
-        strCommand = strContext + 'start';
+        strCommand = 'start timer'
+    }
+    else if (strSpeech.includes("cancel timer") || strSpeech.includes("stop timer"))
+    {
+        strCommand = 'cancel timer'
+    }
+    else if (strSpeech.includes("list timer") || strSpeech.includes("list all timer") || strSpeech.includes("timers") )
+    {
+        strCommand = 'list timers'
+    }
+    else if (strSpeech.includes("start"))
+    {
+        strCommand = 'start';
     }
     else if (strSpeech.includes("stop"))
     {
-        strCommand = strContext + 'stop';
+        strCommand = 'stop';
+    }
+    else if (strSpeech.includes("ingredients"))
+    {
+        strCommand = 'ingredients';
     }
     else if (strSpeech.includes("pause"))
     {
-        strCommand = strContext + 'pause';
+        strCommand = 'pause';
+    }
+    else if (strSpeech.includes("skip step"))
+    {
+        strCommand = 'skip step';
     }
     else if (strSpeech.includes("exit"))
+    {
+    } 
+    else if (strSpeech.includes("help"))
+    {
+        strCommand = 'help';
+    }
     else
     {
         strCommand = 'unknown';
     }
-    eval(array_of_actions[strCommand]);
+
+    //.. Create string of function and parameters
+    //.. First, get the command record
+    getCommandRule(strCommand);
+    commandFunction = commandRule[0].Function;
+
+    //.. Next, append parameters if any
+    commandFunction += '('
+
+    //.. Add parameters here, if any
+
+    commandFunction += ')'
+
+    eval(commandFunction);
 
 }
 
 //.. Speech parser
 function parseSpeech(speech) {
-    var arr = speech.split(triggerWord);
+    if (true) //..(_currentcontext = 'Recipe')
+    {
+        var arr = speech.split(triggerWord);
 
-    if (arr.length = 2) {   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
-        $('#textFromSpeech').empty();
-        $('#textFromSpeech').val(arr[1] + " - Parsed");
-    }
-    else {
-        $('#textFromSpeech').empty();
-        $('#textFromSpeech').val("Parsing Failed!");
+        if (arr.length = 2)   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
+        {
+            $('#textFromSpeech').empty();
+            $('#textFromSpeech').val(arr[1] + " - Parsed");
+        }
+        else
+        {
+            $('#textFromSpeech').empty();
+            $('#textFromSpeech').val("Parsing Failed!");
+        }
     }
 
-    doCommand('1', arr[1]); //.. first argument is the context
+    doCommand(arr[1]);
 }
 
-function say(m) {
-    var msg = new SpeechSynthesisUtterance();
-    var voices = window.speechSynthesis.getVoices();
-    msg.voice = voices[1];
-    msg.voiceURI = "native";
-    msg.volume = 1;
-    msg.rate = 1;
-    msg.pitch = 1.0;
-    msg.text = m;
-    msg.lang = 'en-US';
-    speechSynthesis.speak(msg);
-}
-
+//..........................................................................
+//.. Setup Speech Recognition
+//..........................................................................
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if ('SpeechRecognition' in window)
 {
@@ -86,8 +136,14 @@ if ('SpeechRecognition' in window)
 
     recognition.onresult = function (event)
     {
-        const speechToText = event.results[0][0].transcript;
-        if (speechToText.includes(triggerWord))
+        //.. Retrieve speech string
+        var speechToText = event.results[0][0].transcript;
+ 
+        if (bSubCommand)
+        { //.. If we are in a sub command...
+
+        }
+        else if (speechToText.includes(triggerWord))
         {
             parseSpeech(speechToText);
         }
