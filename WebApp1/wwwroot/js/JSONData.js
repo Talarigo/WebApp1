@@ -76,7 +76,7 @@ var strFunctionJSON =
                     "CommandTableId": 10,
                     "Context": "RecipeStep",
                     "Command": "start",
-                    "Function": "onStartRecipe()"
+                    "Function": "onStartRecipe"
                     ,"Prompt": "Starting Step " 
                 }, {
                     "CommandTableId": 11,
@@ -204,3 +204,9 @@ var strFunctionJSON =
     }`;
 //------------------------------------------------------------
 var JSONObj = JSON.parse(strFunctionJSON);
+//var commandArray = [];
+
+//for (item in JSONObj.CommandRules.CommandRule)
+//{
+//    commandArray.push(JSONObj.CommandRules.CommandRule[item].Function)
+//}

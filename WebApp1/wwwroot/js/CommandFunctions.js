@@ -199,22 +199,35 @@ function onStartTimer(timeInSeconds = 0) //.. Hard coded timer
 
     if (timeInSeconds <= 0)
     {
-        iMinutes = arr.indexOf('minutes');
-        if (iMinutes > 0)
+        //.. Make sure we check for both 'minute' && 'minutes'
+        var iMinute = arr.indexOf('minute');
+        var iMinutes = arr.indexOf('minutes');
+        if ((iMinutes > 0) || (iMinute>0))
         {
-            timeInMinutes = parseInt(arr[iMinutes - 1]);
+            var timeInMinutes = 0;
+
+            if (iMinute > 0) //.. 'minute' was used and not 'minutes'
+                timeInMinutes = parseFloat(arr[iMinute - 1]);
+            else
+                timeInMinutes = parseFloat(arr[iMinutes - 1]);
+
             timeInSeconds = timeInMinutes * 60;
 
             //.. Now get the timer comment
-            comment = '';
-            speechSplit = speech.split('minutes');
+            var comment = '';
+            var speechSplit = speech.split('minutes');
             if (speechSplit.length > 1)
                 comment = speechSplit[1];
             timerStack.push([timeInSeconds, comment]);
 
-            //.. Notify timer setting
-            document.getElementById('lblStatus').innerHTML = 'Timer set for '+ timeInMinutes + ' minutes ' + comment;
+            //.. Start timer
+            var strTimerDetails = timeInMinutes + ' minutes ' + comment;
+            window.setTimeout(timerCallback, timeInSeconds*1000, 'Timer for ' + strTimerDetails + ' completed!');
 
+            //.. Notify timer setting
+            var strTimerText = 'Timer set for ' + strTimerDetails;
+            document.getElementById('lblStatus').innerHTML = strTimerText;
+            say(strTimerText);
         }
         else
         {
@@ -236,9 +249,9 @@ function onCancelTimer(id)
 function convertSecondsToMinsAndSecs(timeInSeconds)
 {
     //.. Returns a text string after converting seconds to minutes & seconds
-    minutes = Math.floor(timeInSeconds / 60);
-    seconds = timeInSeconds % 60;
-    timeDetails = '';
+    var minutes = Math.floor(timeInSeconds / 60);
+    var seconds = timeInSeconds % 60;
+    var timeDetails = '';
     if (minutes > 0)
         timeDetails += minutes + ' minutes';
     if ((minutes > 0) && (seconds > 0))
@@ -257,7 +270,7 @@ function onListTimers()
     for (i = 0; i < timerStack.length; i++)
     {
         //.. Determine time in minutes and seconds
-        timerDetails = '';
+        var timerDetails = '';
         if (timerStack[i][0] > 0)
         {
             timerDetails = 'Timer ' + (i + 1) + ' set for ';
@@ -266,7 +279,7 @@ function onListTimers()
         }
 
         //.. Now attach the comment
-        timerComment = timerStack[i][1];
+        var timerComment = timerStack[i][1];
         if ((timerComment != undefined) && (timerComment != ''))
         {
             timerDetails += timerComment;
@@ -310,4 +323,9 @@ function say(m) {
     speechSynthesis.speak(msg);
 }
 
-say('hi');
+function timerCallback(strTimerDetails)
+{
+    //.. Process end of timer
+    document.getElementById('lblStatus').innerHTML = strTimerDetails;
+    say(strTimerDetails)
+}

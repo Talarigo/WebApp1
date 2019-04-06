@@ -15,14 +15,24 @@ function PlaySound(filename)
 {
     //..var sound = document.getElementById(soundObj);
     //sound = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
-    sound = new Audio(filename);
+    var sound = new Audio(filename);
     sound.Play();
     //..
 }
+
 function onPressButton()
 {
-    //say("Hi. Welcome!");
-    //PlaySound('Indian Bell.mp3');
+    //var player = require('play-sound')(opts = {})
+
+    //player.play('indian bell.mp3', function (err)
+    //{
+    //    if (err) throw err;
+    //    console.log("Audio finished");
+    //});
+
+    //.. say("Hi. Welcome!");
+    ////PlaySound('Indian Bell.mp3');
+
     var strTextFromSpeech = document.getElementById("textFromSpeech").value;
     strTextFromSpeech = strTextFromSpeech.toLowerCase();
     doCommand(strTextFromSpeech);
@@ -87,18 +97,35 @@ function doCommand(strSpeech)
     //.. Create string of function and parameters
     //.. First, get the command record
     getCommandRule(strCommand);
-    commandFunction = commandRule[0].Function;
+    var commandFunction = commandRule[0].Function;
 
     //.. Next, append parameters if any
     commandFunction += '('
 
     //.. Add parameters here, if any
 
+    //.. Close paranthesis
     commandFunction += ')'
 
+    //.. Now, execute the function
     eval(commandFunction);
 
 }
+
+//var myMatch = function (command)
+//{
+//    if (commandArray.indexOf(element) >= 0)
+//    {
+//        sessionStorage["Command"] = element;
+//    }
+
+//}
+
+//doTestCommand(strSpeech)
+//{
+
+//}
+
 
 //.. Speech parser
 function parseSpeech(speech) {
@@ -114,11 +141,12 @@ function parseSpeech(speech) {
         else
         {
             $('#textFromSpeech').empty();
-            $('#textFromSpeech').val("Parsing Failed!");
+            $('#textFromSpeech').val("You didn't say the keyword!");
         }
     }
 
     doCommand(arr[1]);
+    //..doTestCommand(arr[1]);
 }
 
 //..........................................................................
