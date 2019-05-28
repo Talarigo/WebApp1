@@ -6,36 +6,23 @@
 //------------------------------------------------------------
 //globals
 //------------------------------------------------------------
-const triggerWord = 'hello';
+var triggerWord = 'felix';
 sessionStorage["context"] = 'Home';
 sessionStorage["stepNumber"] = 0;
 sessionStorage["speechString"] = '';
+myRecognition = null;
 //------------------------------------------------------------
-function PlaySound(filename)
-{
-    //..var sound = document.getElementById(soundObj);
-    //sound = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
-    var sound = new Audio(filename);
-    sound.Play();
-    //..
-}
-
 function onPressButton()
 {
-    //var player = require('play-sound')(opts = {})
 
-    //player.play('indian bell.mp3', function (err)
-    //{
-    //    if (err) throw err;
-    //    console.log("Audio finished");
-    //});
-
-    //.. say("Hi. Welcome!");
-    ////PlaySound('Indian Bell.mp3');
+    say("Hi. Welcome! ");
 
     var strTextFromSpeech = document.getElementById("textFromSpeech").value;
-    strTextFromSpeech = strTextFromSpeech.toLowerCase();
-    doCommand(strTextFromSpeech);
+//    if (strTextFromSpeech != '')
+    {
+        strTextFromSpeech = strTextFromSpeech.toLowerCase();
+        doCommand(strTextFromSpeech);
+    }
 }
 
 //.. Execute given command
@@ -61,6 +48,14 @@ function doCommand(strSpeech)
     else if (strSpeech.includes("list timer") || strSpeech.includes("list all timer") || strSpeech.includes("timers") )
     {
         strCommand = 'list timers'
+    }
+    else if ((strSpeech.includes("title")) || (strSpeech.includes("name")))
+    {
+        strCommand = 'title';
+    }
+    else if (strSpeech.includes("description"))
+    {
+        strCommand = 'description';
     }
     else if (strSpeech.includes("start"))
     {
@@ -112,21 +107,6 @@ function doCommand(strSpeech)
 
 }
 
-//var myMatch = function (command)
-//{
-//    if (commandArray.indexOf(element) >= 0)
-//    {
-//        sessionStorage["Command"] = element;
-//    }
-
-//}
-
-//doTestCommand(strSpeech)
-//{
-
-//}
-
-
 //.. Speech parser
 function parseSpeech(speech) {
     if (true) //..(_currentcontext = 'Recipe')
@@ -135,13 +115,15 @@ function parseSpeech(speech) {
 
         if (arr.length = 2)   //Note if less than 2, there was no triggerword. If greater than 2, multiple triggerwords detected
         {
-            $('#textFromSpeech').empty();
-            $('#textFromSpeech').val(arr[1] + " - Parsed");
+            postSpeech(arr[1]);
+            //$('#textFromSpeech').empty();
+            //$('#textFromSpeech').val(arr[1] + " - Parsed");
         }
         else
         {
-            $('#textFromSpeech').empty();
-            $('#textFromSpeech').val("You didn't say the keyword!");
+            postSpeech("you didn't say the keyword");
+            //$('#textFromSpeech').empty();
+            //$('#textFromSpeech').val("You didn't say the keyword!");
         }
     }
 
@@ -149,50 +131,64 @@ function parseSpeech(speech) {
     //..doTestCommand(arr[1]);
 }
 
+function processCommand(event)
+{
+    //.. Retrieve speech string
+    var speechToText = event.results[0][0].transcript;
+
+    if (speechToText.includes(triggerWord))
+    {
+        parseSpeech(speechToText);
+    }
+    else
+    {
+        //.. This is speech without keyword invocation
+        postSpeech(speechToText + ' - Giberish');
+        //$('#textFromSpeech').val(speechToText + " - Giberish");
+    }
+}
+
+function endListening()
+{
+    //console.log('Speech recognition service disconnected');
+    if (!stopListening)
+        myRecognition.start();
+    else
+        postSpeech('Exited');
+        //$('#textFromSpeech').val('Exited');
+}
+
+function postSpeech(msg)
+{
+    document.getElementById('lblSpeech').innerHTML = msg;
+}
+
 //..........................................................................
 //.. Setup Speech Recognition
 //..........................................................................
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-if ('SpeechRecognition' in window)
+if (('SpeechRecognition' in window))
 {
     // speech recognition API supported
-
-    const recognition = new window.SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    //.. const 
+    myRecognition = new window.SpeechRecognition();
+    myRecognition.continuous = false;
+    myRecognition.interimResults = false;
     var stopListening = false;  //.. Flag recognizes 'exit' request
 
-    recognition.onresult = function (event)
-    {
-        //.. Retrieve speech string
-        var speechToText = event.results[0][0].transcript;
- 
-        if (bSubCommand)
-        { //.. If we are in a sub command...
-
-        }
-        else if (speechToText.includes(triggerWord))
-        {
-            parseSpeech(speechToText);
-        }
-        else
-        {
-            //.. This is speech without keyword invocation
-            $('#textFromSpeech').val(speechToText + " - Giberish");
-        }
-    }
+    myRecognition.onresult = processCommand;
 
     //.. onend function. determine if needed to start listening again.
-    recognition.onend = function ()
+    myRecognition.onend = function ()
     {
         //console.log('Speech recognition service disconnected');
         if (!stopListening)
-            recognition.start();
+            myRecognition.start();
         else
             $('#textFromSpeech').val('Exited');
     }
 
-    recognition.start();
+    myRecognition.start();
 }
 else
 {
@@ -200,3 +196,18 @@ else
     //alert('not');
    $('#textFromSpeech').val('Aw. Looks like your browser does not support Web Speech API.  Update browser or try a different browser.');
 }
+
+//..--------------------------------------------------------------------
+//var countdownNumberEl = document.getElementById('countdown-number');
+//var countdown = 10;
+
+//countdownNumberEl.textContent = countdown;
+
+//setInterval(function ()
+//{
+//    countdown = --countdown <= 0 ? 10 : countdown;
+
+//    countdownNumberEl.textContent = countdown;
+//}, 1000);
+
+//..--------------------------------------------------------------------

@@ -1,4 +1,72 @@
 ﻿<!DOCTYPE html>
+<script>
+    var countdownNumberEl = document.getElementById('countdown-number');
+    var countdown = 10;
+
+    countdownNumberEl.textContent = countdown;
+
+    setInterval(function ()
+    {
+        countdown = --countdown <= 0 ? 10 : countdown;
+
+        countdownNumberEl.textContent = countdown;
+    }, 1000);
+</script>
+
+<style>
+    body {
+    height: 100%;
+    width: 100%;
+    background-color: #333;
+    }
+
+    #countdown {
+    position: relative;
+    margin: auto;
+    margin-top: 100px;
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    }
+
+    #countdown-number {
+    color: white;
+    display: inline-block;
+    line-height: 40px;
+    }
+
+
+    svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 400px;
+    transform: rotateY(-180deg) rotateZ(-90deg);
+    }
+
+    svg circle {
+    stroke-dasharray: 113px;
+    stroke-dashoffset: 0px;
+    stroke-linecap: round;
+    stroke-width: 4px;
+    stroke: black;
+    fill:lightgray;
+    animation: countdown 10s linear infinite forwards;
+    }
+
+
+    @@keyframes countdown {
+    from {
+    stroke-dashoffset: px;
+    }
+    to {
+    stroke-dashoffset: 113px;
+    }
+    }
+
+</style>
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -31,12 +99,19 @@
         <source src="Indian Bell.mp3" />
     </audio>
 
-    You Said: <input id="textFromSpeech" size="480" />
+    You Said: <label id="lblSpeech">Default</label>
+    <input id="textFromSpeech" size="480" />
     <button id="btnStart" onClick="javascript: onPressButton();"><img src="img/buttons-img/Play - Glassy Orange.jpg" width="30" height="30" /></button>
     @*<button id="btnStart" onClick="javascript: say('hello');"><img src="img/buttons-img/Play - Glassy Orange.jpg" width="30" height="30" /></button>*@
     <label id="lblLabel">Status :&nbsp;</label><label id="lblStatus">Listening...</label>
     <br />
 
+    <div id="countdown">
+        <div id="countdown-number"></div>
+        <svg>
+            <circle r="40" cx="55" cy="55"></circle>
+        </svg>
+    </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
@@ -62,12 +137,11 @@
                 integrity="sha256-E/V4cWE4qvAeO5MOhjtGtqDzPndRO1LBk8lJ/PR7CA4=">
         </script>
     </environment>
-    @*<script src="~/js/RecipeJSON.js" asp-append-version="true"></script>*@
     <script src="~/js/JSONData.js" asp-append-version="true"></script>
     <script src="~/js/CommandFunctions.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @*<embed src="~/audio/timerbell.mp3" type="audio/mpeg" autostart="false"
-        width="0" height="0" id="soundTimerBell" enablejavascript="true">*@
+    <script src="~/js/classIngredients.js" asp-append-version="true"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

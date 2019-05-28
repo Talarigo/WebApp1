@@ -1,16 +1,14 @@
-﻿//..jQuery(document).ready(function () { onStartStep(); })
-
-//------------------------------------------------------------
+﻿//------------------------------------------------------------
 //.. Globals ??
 //------------------------------------------------------------
 var contextStack = [];
 contextStack.push('Home');  //.. Initialize
-
 var bSubCommand = false;
 var commandRule = [];
 var timerStack = [];  //... Do we need time + comment?
 //------------------------------------------------------------
 
+//------------------------------------------------------------
 function getCommandRule(command, context='-1')
 {
     //.. First reset the commandRule array
@@ -21,7 +19,7 @@ function getCommandRule(command, context='-1')
     if (context == undefined)
         context = '';
 
-    $.each(JSONObj.CommandRules.CommandRule, function(i, item)
+    $.each(JSONCommandFunctionObj.CommandRules.CommandRule, function(i, item)
     {
         /** Note: If specific context AND 'no-context' nodes exist, the first item pushed is the specific context node.
             So, always access the [0]th item from the commandRule array **/
@@ -37,7 +35,7 @@ function getCommandRule(command, context='-1')
     if (commandRule.length == 0)
     {
         //... Needs to be fixed
-        commandRule.push(JSONObj.CommandRules.CommandRule[911]);  //... JR: Hard coded. Fix it
+        commandRule.push(JSONCommandFunctionObj.CommandRules.CommandRule[911]);  //... JR: Hard coded. Fix it
     }
 }
 
@@ -61,7 +59,7 @@ function execSubCommand(strCommand='help', prompt = "Say Yes or NO", commands=[ 
             }
         );
 }
-//------------------------------------------------------------
+
 //------------------------------------------------------------
 //..   Call backs for commands
 //------------------------------------------------------------
@@ -71,6 +69,7 @@ function onRecipeHelp(stepNumber = -1)
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onStartRecipe()
 {
     sessionStorage["context"] = "Home";
@@ -86,46 +85,88 @@ function onStartRecipe()
     onStartStep();
 }
 
+//------------------------------------------------------------
 function onAnnounceTitle(prompt='', stepNumber=-1)
 {
-    say(commandRule[0].Prompt);
+    var strTitle = JSONRecipeObj.Title;
+    say(strTitle);
 }
 
+//------------------------------------------------------------
 function onAnnounceDescription(prompt='',stepNumber = -1)
 {
     say(commandRule[0].Prompt);
 }
 
-function onListIngredients(prompt='',stepNumber = -1)
+//------------------------------------------------------------
+function onListIngredients(bPrompt=true,stepNumber = -1)
 {
-    say(commandRule[0].Prompt);
+
+    if (JSONRecipeObj.Ingredients.length > 0)
+    {
+        //..ToDo: Because we need verbal response for each ingredient,
+        //..   we need to change the myRecognition.onResult callback
+        //..   Then, restore the original callback
+        //var origCallback = myRecognition.onresult;
+        //myRecognition.onresult = processPromptedInteraction;
+
+        //.. Push ingredients into an array
+        var myIngredientsList = [];
+        for (i = 0; i < JSONRecipeObj.Ingredients.length; i++)
+        {
+            var strIngredient = '';
+            strIngredient = JSONRecipeObj.Ingredients[i].Ingredient.Ingredient;
+            myIngredientsList.push(strIngredient);
+        }
+
+        if (bPrompt)
+        {
+            myIngredientsObj.setIngredients(myIngredientsList);
+            myIngredientsObj.start().onComplete = function (result)
+            {
+                //..console.log(this.answers);
+                say("End of Ingredients")
+                postStatus("Ingredients Done!")
+            };
+        }
+        else
+        {
+            myIngredientsList.forEach(function (item) { say(item); });
+        }
+    }
 }
 
+//------------------------------------------------------------
 function onListToolsNeeded(prompt='',stepNumber = -1)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onListAllSteps(prompt='',)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onReadComments(prompt='',stepNumber = -1)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onAddComment(stepNumber = -1)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onStepHelp(stepNumber = -1)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onStartStep(stepNumber=-1)
 {
     if (stepNumber == -1)
@@ -152,6 +193,7 @@ function onStartStep(stepNumber=-1)
     }
 }
 
+//------------------------------------------------------------
 function onStopStep(prompt='',)
 {
     //.. Note where you were.  Just in case user decides to continue...
@@ -163,27 +205,32 @@ function onStopStep(prompt='',)
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onPauseStep(prompt='',)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onContinueStep(prompt='',)
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onSkipStep(prompt='',)
 {
     say(commandRule[0].Prompt);
     say();
 }
 
+//------------------------------------------------------------
 function onIngredientSubstitute(prompt = '', )
 {
     say(commandRule[0].Prompt);
 }
 
+//------------------------------------------------------------
 function onStartTimer(timeInSeconds = 0) //.. Hard coded timer
 {
     //if ( timeInSeconds <=0 && !contextStack.find("Timer"))
@@ -192,11 +239,9 @@ function onStartTimer(timeInSeconds = 0) //.. Hard coded timer
     //    say("How long?")
     //}
 
-    //.. Push timer details item to a timer stack
+    ////.. Push timer details item to a timer stack
     var speech = sessionStorage["speechString"];
-
     var arr = speech.split(' ');
-
     if (timeInSeconds <= 0)
     {
         //.. Make sure we check for both 'minute' && 'minutes'
@@ -215,18 +260,23 @@ function onStartTimer(timeInSeconds = 0) //.. Hard coded timer
 
             //.. Now get the timer comment
             var comment = '';
-            var speechSplit = speech.split('minutes');
+            var speechSplit;
+            //.. Note: 'minute' vs 'minutes'
+            if (iMinute > 0)
+                speechSplit = speech.split('minute');
+            else
+                speechSplit = speech.split('minutes');
             if (speechSplit.length > 1)
                 comment = speechSplit[1];
             timerStack.push([timeInSeconds, comment]);
 
             //.. Start timer
             var strTimerDetails = timeInMinutes + ' minutes ' + comment;
-            window.setTimeout(timerCallback, timeInSeconds*1000, 'Timer for ' + strTimerDetails + ' completed!');
+            window.setTimeout(timerCallback, timeInSeconds*1000, strTimerDetails);  //.. Needs time in milliseconds && Passing the timerdetails as a parameter
 
             //.. Notify timer setting
             var strTimerText = 'Timer set for ' + strTimerDetails;
-            document.getElementById('lblStatus').innerHTML = strTimerText;
+            postStatus(strTimerText);
             say(strTimerText);
         }
         else
@@ -236,14 +286,15 @@ function onStartTimer(timeInSeconds = 0) //.. Hard coded timer
     }
 }
 
+//------------------------------------------------------------
 function onCancelTimer(id)
 {
-    if (contextStack[contextStack.length-1] = "Timer")
-    {
-        contextStack.pop();
+    //if (contextStack[contextStack.length-1] = "Timer")
+    //{
+    //    contextStack.pop();
 
-        //.. Delete timer item from timer stack
-    }
+    //    //.. Delete timer item from timer stack
+    //}
 }
 
 function convertSecondsToMinsAndSecs(timeInSeconds)
@@ -262,6 +313,7 @@ function convertSecondsToMinsAndSecs(timeInSeconds)
     return timeDetails;
 }
 
+//------------------------------------------------------------
 function onListTimers()
 {
     //.. List all timer items from timer stack
@@ -290,26 +342,31 @@ function onListTimers()
 
         //.. Now, state the details.
         //.. Notify timer setting
-        document.getElementById('lblStatus').innerHTML = timerDetails;
+        postStatus(timerDetails);
         say(timerDetails);
     }
 }
 
+//------------------------------------------------------------
 function onExitRecipe(prompt='',)
 {
-    stopListening = true;
-    say(commandRule[0].Prompt);
+    //stopListening = true;
+    //say(commandRule[0].Prompt);
 }
 
-
+//------------------------------------------------------------
 function onUnknown(prompt='',)
 {
     say(commandRule[0].Prompt);
 }
-//------------------------------------------------------------
-//------------------------------------------------------------
-//------------------------------------------------------------
 
+//------------------------------------------------------------
+function postStatus(msg)
+{
+    document.getElementById('lblStatus').innerHTML = msg;
+}
+
+//------------------------------------------------------------
 function say(m) {
     var msg = new SpeechSynthesisUtterance();
     var voices = window.speechSynthesis.getVoices();
@@ -321,11 +378,19 @@ function say(m) {
     msg.text = m;
     msg.lang = 'en-US';
     speechSynthesis.speak(msg);
+
+    //.. Also display in status
+    postStatus(m);
+    //.. document.getElementById('lblStatus').innerHTML = m;
+
 }
 
+//------------------------------------------------------------
 function timerCallback(strTimerDetails)
 {
     //.. Process end of timer
-    document.getElementById('lblStatus').innerHTML = strTimerDetails;
-    say(strTimerDetails)
+    strTimerCompletedMsg = 'Timer for ' + strTimerDetails + ' Completed!'
+    postStatus(strTimerCompletedMsg);
+    say(strTimerCompletedMsg);
 }
+//------------------------------------------------------------
